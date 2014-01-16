@@ -1,0 +1,48 @@
+#!/bin/bash
+
+: ${ROOT:="/mysql"}
+: ${INNODB_LOG_FILE_SIZE:=67108864}
+: ${INNODB_BUFFER_POOL_SIZE:=2147483648}
+
+bootstrap() {
+    if [[ -d ${ROOT}/datadir ]]
+    then
+	echo $ROOT/datadir already exists.
+	return
+    fi
+
+    mkdir -p ${ROOT}/datadir/mysql ${ROOT}/tmp
+
+    echo Bootstrap...
+    (
+	echo 'use mysql;';
+	cat /usr/share/mysql/mysql_system_tables.sql;
+	cat /usr/share/mysql/mysql_system_tables_data.sql |
+	sed -e "s/@@hostname/'%'/";
+    ) |
+    /usr/sbin/mysqld \
+	--no-defaults --bootstrap \
+	--datadir=${ROOT}/datadir \
+	--tmpdir=${ROOT}/tmp/ \
+	--language=/usr/share/mysql/english \
+	--character-sets-dir=/usr/share/mysql/charsets \
+        --innodb_log_file_size=${INNODB_LOG_FILE_SIZE} \
+        --innodb_buffer_pool_size=${INNODB_BUFFER_POOL_SIZE}
+}
+
+bootstrap
+
+exec /usr/sbin/mysqld \
+  --no-defaults \
+  --datadir=${ROOT}/datadir \
+  --tmpdir=${ROOT}/tmp/ \
+  --lc-messages-dir=/usr/share/mysql \
+  --character-sets-dir=/usr/share/mysql/charsets \
+  --sock=${ROOT}/mysql.sock \
+  --pid-file=${ROOT}/mysql.pid \
+  --log-error=${ROOT}/mysql.err \
+  --innodb_file_per_table \
+  --user=root \
+  --port=3306 \
+  --innodb_log_file_size=${INNODB_LOG_FILE_SIZE} \
+  --innodb_buffer_pool_size=${INNODB_BUFFER_POOL_SIZE} \
