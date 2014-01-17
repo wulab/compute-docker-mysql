@@ -7,7 +7,6 @@
 bootstrap() {
     if [[ -d ${ROOT}/datadir ]]
     then
-	echo $ROOT/datadir already exists.
 	return
     fi
 
@@ -24,14 +23,16 @@ bootstrap() {
 	--no-defaults --bootstrap \
 	--datadir=${ROOT}/datadir \
 	--tmpdir=${ROOT}/tmp/ \
-	--language=/usr/share/mysql/english \
+	--lc-messages-dir=/usr/share/mysql \
 	--character-sets-dir=/usr/share/mysql/charsets \
         --innodb_log_file_size=${INNODB_LOG_FILE_SIZE} \
         --innodb_buffer_pool_size=${INNODB_BUFFER_POOL_SIZE}
+    echo Bootstrap completed
 }
 
 bootstrap
 
+echo Start mysqld
 exec /usr/sbin/mysqld \
   --no-defaults \
   --datadir=${ROOT}/datadir \
@@ -42,6 +43,7 @@ exec /usr/sbin/mysqld \
   --pid-file=${ROOT}/mysql.pid \
   --log-error=${ROOT}/mysql.err \
   --innodb_file_per_table \
+  --skip-name-resolve \
   --user=root \
   --port=3306 \
   --innodb_log_file_size=${INNODB_LOG_FILE_SIZE} \

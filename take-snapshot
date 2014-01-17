@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DISK_NO=$(curl -s "http://metadata/computeMetadata/v1/instance/disks/" -H "X-Google-Metadata-Request: True")
+DISK=$(curl -s "http://metadata/computeMetadata/v1/instance/disks/${DISK_NO}/device-name" -H "X-Google-Metadata-Request: True")
+/gcutil/gcutil addsnapshot --source_disk=${DISK} ${DISK}-snapshot-$(date +%s)
