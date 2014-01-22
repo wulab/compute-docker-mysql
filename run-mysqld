@@ -7,7 +7,7 @@ set -x
 : ${INNODB_LOG_FILE_SIZE:=$((64 * 1024 * 1024))}
 : ${INNODB_BUFFER_POOL_SIZE_PCT:=80}
 : ${INNODB_BUFFER_POOL_SIZE:=$((
-      $(free -b | grep Mem: | awk '{print $2}') *
+      $(cat /proc/meminfo | grep MemTotal: | awk '{print $2}') * 1024 *
       ${INNODB_BUFFER_POOL_SIZE_PCT} / 100
       ))}
 
@@ -20,10 +20,10 @@ bootstrap() {
   mkdir -p ${ROOT}/datadir/mysql ${ROOT}/tmp
 
   (
-    echo 'use mysql;';
-    cat /usr/share/mysql/mysql_system_tables.sql;
+    echo 'use mysql;'
+    cat /usr/share/mysql/mysql_system_tables.sql
     cat /usr/share/mysql/mysql_system_tables_data.sql |
-    sed -e "s/@@hostname/'%'/";
+    sed -e "s/^SELECT.*INTO @current_hostname;$/SELECT '%' INTO @current_hostname;/"
   ) |
   /usr/sbin/mysqld \
     --no-defaults --bootstrap \

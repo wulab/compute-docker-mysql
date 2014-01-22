@@ -1,10 +1,9 @@
-FROM ubuntu
+FROM debian
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN apt-get -y install mysql-server-core-5.5 mysql-client-core-5.5 curl python supervisor cron
+RUN apt-get -y install mysql-server-core-5.5 mysql-client-5.5 curl python supervisor cron
 
 RUN curl -s -O https://dl.google.com/dl/cloudsdk/release/artifacts/gcutil-1.12.0.tar.gz
 RUN tar xzf gcutil-1.12.0.tar.gz
