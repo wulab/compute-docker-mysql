@@ -13,7 +13,7 @@ RUN rm gcutil-1.12.0.tar.gz
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ADD ./run-mysqld /run-mysqld
-ADD ./take-snapshot /etc/cron.hourly/take-snapshot
+ADD ./take-snapshot /etc/cron.daily/take-snapshot
 
 EXPOSE 3306
 
