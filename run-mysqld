@@ -1,5 +1,8 @@
 #!/bin/bash
 
+env
+set -x
+
 : ${ROOT:="/mysql"}
 : ${INNODB_LOG_FILE_SIZE:=$((64 * 1024 * 1024))}
 : ${INNODB_BUFFER_POOL_SIZE_PCT:=80}
@@ -16,7 +19,6 @@ bootstrap() {
 
   mkdir -p ${ROOT}/datadir/mysql ${ROOT}/tmp
 
-  echo Bootstrap...
   (
     echo 'use mysql;';
     cat /usr/share/mysql/mysql_system_tables.sql;
@@ -31,12 +33,10 @@ bootstrap() {
     --character-sets-dir=/usr/share/mysql/charsets \
     --innodb_log_file_size=${INNODB_LOG_FILE_SIZE} \
     --innodb_buffer_pool_size=${INNODB_BUFFER_POOL_SIZE}
-  echo Bootstrap completed
 }
 
 bootstrap
 
-echo Start mysqld
 exec /usr/sbin/mysqld \
   --no-defaults \
   --datadir=${ROOT}/datadir \
@@ -45,7 +45,6 @@ exec /usr/sbin/mysqld \
   --character-sets-dir=/usr/share/mysql/charsets \
   --sock=${ROOT}/mysql.sock \
   --pid-file=${ROOT}/mysql.pid \
-  --log-error=${ROOT}/mysql.err \
   --innodb_file_per_table \
   --skip-name-resolve \
   --user=root \
